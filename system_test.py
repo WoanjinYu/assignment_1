@@ -10,17 +10,17 @@ def fileSys() -> fileSys:
     return fs
 
 @pytest.fixture
-def fileSys_complex() -> fileSys:
-    ms = fileSys()
-    ms.new_directory('.', "Dir_1")
-    ms.new_directory('.', "Dir_2")
-    ms.new_directory('.', "Dir_3")
-    ms.new_directory('./Dir_1', "Dir_11")
-    ms.new_directory('./Dir_1', "Dir_12")
-    ms.new_directory('./Dir_2', "Dir_21")
-    ms.new_directory('./Dir_2', "Dir_22")
+def fileSys_composite() -> fileSys:
+    fs = fileSys()
+    fs.new_directory('.', "Dir_1")
+    fs.new_directory('.', "Dir_2")
+    fs.new_directory('.', "Dir_3")
+    fs.new_directory('./Dir_1', "Dir_11")
+    fs.new_directory('./Dir_1', "Dir_12")
+    fs.new_directory('./Dir_2', "Dir_21")
+    fs.new_directory('./Dir_2', "Dir_22")
 
-    return ms
+    return fs
 
 
 def test_fileSys_creation():
@@ -39,8 +39,8 @@ def test_fileSys_new_directories():
     assert fs.root.son[0].son[0].name == "Nested_Dir"
 
 
-def test_get_node(filesystem_complex: fileSys):
-    node = filesystem_complex.get_node("./Dir_1/Dir_12")
+def test_get_node(filesystem_composite: fileSys):
+    node = filesystem_composite.get_node("./Dir_1/Dir_12")
 
     assert isinstance(node, Directory)
     assert node.name == "Dir_12"
@@ -67,23 +67,23 @@ def test_new_buffer(filesystem: fileSys):
     assert len(filesystem.root.son[0].son[0].items) == 0
 
 
-def test_delete(filesystem_complex: fileSys):
-    filesystem_complex.new_buffer("./Dir_1/Dir_11", "dummy.buf")
+def test_delete(filesystem_composite: fileSys):
+    filesystem_composite.new_buffer("./Dir_1/Dir_11", "dummy.buf")
 
-    buffer_file = filesystem_complex.get_node("./Dir_1/Dir_11/dummy.buf")
-    folder = filesystem_complex.get_node("./Dir_1/Dir_11")
+    buffer_file = filesystem_composite.get_node("./Dir_1/Dir_11/dummy.buf")
+    folder = filesystem_composite.get_node("./Dir_1/Dir_11")
 
     buffer_file.delete()
 
 
-def test_delete_2(filesystem_complex: fileSys):
-    filesystem_complex.new_buffer("./Dir_1/Dir_11", "dummy.buf")
-    filesystem_complex.new_log_file("./Dir_1/Dir_11", "1.log")
-    filesystem_complex.new_log_file("./Dir_1/Dir_11", "2.log")
-    filesystem_complex.new_log_file("./Dir_1/Dir_11", "3.log")
+def test_delete_2(filesystem_composite: fileSys):
+    filesystem_composite.new_buffer("./Dir_1/Dir_11", "dummy.buf")
+    filesystem_composite.new_log_file("./Dir_1/Dir_11", "1.log")
+    filesystem_composite.new_log_file("./Dir_1/Dir_11", "2.log")
+    filesystem_composite.new_log_file("./Dir_1/Dir_11", "3.log")
 
-    target = filesystem_complex.get_node("./Dir_1/Dir_11/2.log")
-    folder = filesystem_complex.get_node("./Dir_1/Dir_11")
+    target = filesystem_composite.get_node("./Dir_1/Dir_11/2.log")
+    folder = filesystem_composite.get_node("./Dir_1/Dir_11")
 
     target.delete()
 
