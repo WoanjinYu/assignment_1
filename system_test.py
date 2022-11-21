@@ -3,27 +3,27 @@ import pytest
 
 
 @pytest.fixture
-def memsystem() -> fileSys:
+def fileSys() -> fileSys:
     fs = fileSys()
-    fs.create_directory('.', "Dir_1")
+    fs.new_directory('.', "Dir_1")
 
     return fs
 
 @pytest.fixture
-def memsystem_complex() -> fileSys:
+def fileSys_complex() -> fileSys:
     ms = fileSys()
-    ms.create_directory('.', "Dir_1")
-    ms.create_directory('.', "Dir_2")
-    ms.create_directory('.', "Dir_3")
-    ms.create_directory('./Dir_1', "Dir_11")
-    ms.create_directory('./Dir_1', "Dir_12")
-    ms.create_directory('./Dir_2', "Dir_21")
-    ms.create_directory('./Dir_2', "Dir_22")
+    ms.new_directory('.', "Dir_1")
+    ms.new_directory('.', "Dir_2")
+    ms.new_directory('.', "Dir_3")
+    ms.new_directory('./Dir_1', "Dir_11")
+    ms.new_directory('./Dir_1', "Dir_12")
+    ms.new_directory('./Dir_2', "Dir_21")
+    ms.new_directory('./Dir_2', "Dir_22")
 
     return ms
 
 
-def test_memsystem_creation():
+def test_fileSys_creation():
     fs = fileSys()
     
     assert fs.root.name == '~'
@@ -31,10 +31,10 @@ def test_memsystem_creation():
 
 
 
-def test_memsystem_create_directories():
+def test_fileSys_new_directories():
     fs = fileSys()
-    fs.create_directory('.', "Dir_1")
-    fs.create_directory('./Dir_1', "Nested_Dir")
+    fs.new_directory('.', "Dir_1")
+    fs.new_directory('./Dir_1', "Nested_Dir")
 
     assert fs.root.son[0].son[0].name == "Nested_Dir"
 
@@ -46,29 +46,29 @@ def test_get_node(filesystem_complex: fileSys):
     assert node.name == "Dir_12"
 
 
-def test_create_binary_file(filesystem: fileSys):
-    file = filesystem.create_binary_file("./Dir_1", "file.bin", "Dummy info")
+def test_new_binary_file(filesystem: fileSys):
+    file = filesystem.new_binary_file("./Dir_1", "file.bin", "Dummy info")
 
     assert filesystem.root.son[0].son[0].name == "file.bin"
     assert filesystem.root.son[0].son[0].information == "Dummy info"
 
 
-def test_create_log_file(filesystem: fileSys):
-    file = filesystem.create_log_file("./Dir_1", "file.log", "Log info")
+def test_new_log_file(filesystem: fileSys):
+    file = filesystem.new_log_file("./Dir_1", "file.log", "Log info")
 
     assert filesystem.root.son[0].son[0].name == "file.log"
     assert filesystem.root.son[0].son[0].information == "Log info"
 
 
-def test_create_buffer(filesystem: fileSys):
-    file = filesystem.create_buffer("./Dir_1", "file.buf")
+def test_new_buffer(filesystem: fileSys):
+    file = filesystem.new_buffer("./Dir_1", "file.buf")
 
     assert filesystem.root.son[0].son[0].name == "file.buf"
     assert len(filesystem.root.son[0].son[0].items) == 0
 
 
 def test_delete(filesystem_complex: fileSys):
-    filesystem_complex.create_buffer("./Dir_1/Dir_11", "dummy.buf")
+    filesystem_complex.new_buffer("./Dir_1/Dir_11", "dummy.buf")
 
     buffer_file = filesystem_complex.get_node("./Dir_1/Dir_11/dummy.buf")
     folder = filesystem_complex.get_node("./Dir_1/Dir_11")
@@ -77,10 +77,10 @@ def test_delete(filesystem_complex: fileSys):
 
 
 def test_delete_2(filesystem_complex: fileSys):
-    filesystem_complex.create_buffer("./Dir_1/Dir_11", "dummy.buf")
-    filesystem_complex.create_log_file("./Dir_1/Dir_11", "1.log")
-    filesystem_complex.create_log_file("./Dir_1/Dir_11", "2.log")
-    filesystem_complex.create_log_file("./Dir_1/Dir_11", "3.log")
+    filesystem_complex.new_buffer("./Dir_1/Dir_11", "dummy.buf")
+    filesystem_complex.new_log_file("./Dir_1/Dir_11", "1.log")
+    filesystem_complex.new_log_file("./Dir_1/Dir_11", "2.log")
+    filesystem_complex.new_log_file("./Dir_1/Dir_11", "3.log")
 
     target = filesystem_complex.get_node("./Dir_1/Dir_11/2.log")
     folder = filesystem_complex.get_node("./Dir_1/Dir_11")
@@ -88,24 +88,24 @@ def test_delete_2(filesystem_complex: fileSys):
     target.delete()
 
 
-def test_binary_file_read(memsystem: fileSys):
-    memsystem.create_binary_file("./Dir_1/Dir_11", "dummy.bin", "some info")
-    bin_file = memsystem.get_node("./Dir_1/Dir_11/dummy.bin")
+def test_binary_file_read(fileSys: fileSys):
+    fileSys.new_binary_file("./Dir_1/Dir_11", "dummy.bin", "some info")
+    bin_file = fileSys.get_node("./Dir_1/Dir_11/dummy.bin")
 
     assert (bin_file.read() == "some info")
 
 
-def test_log_file_read(memsystem: fileSys):
-    memsystem.create_log_file("./Dir_1/Dir_11", "dummy.log", "some info")
-    log_file = memsystem.get_node("./Dir_1/Dir_11/dummy.log")
+def test_log_file_read(fileSys: fileSys):
+    fileSys.new_log_file("./Dir_1/Dir_11", "dummy.log", "some info")
+    log_file = fileSys.get_node("./Dir_1/Dir_11/dummy.log")
     log_file.append("\nsome more info")
 
     assert (log_file.read() == "some info\nsome more info")
 
 
-def test_buffer_file_push(memsystem: fileSys):
-    memsystem.create_buffer("./Dir_1/Dir_11", "dummy.buf")
-    buffer = memsystem.get_node("./Dir_1/Dir_11/dummy.buf")
+def test_buffer_file_push(fileSys: fileSys):
+    fileSys.new_buffer("./Dir_1/Dir_11", "dummy.buf")
+    buffer = fileSys.get_node("./Dir_1/Dir_11/dummy.buf")
 
     assert len(buffer.items) == 0
 
@@ -116,4 +116,4 @@ def test_buffer_file_push(memsystem: fileSys):
     assert len(buffer.items) == 3
 
 
-    memsystem.create_directory(".", "Dummy")
+    fileSys.new_directory(".", "Dummy")
